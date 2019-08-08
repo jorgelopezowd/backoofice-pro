@@ -12,9 +12,11 @@ import TimelineChart from './TimelineChart';
 import WaterWave from './WaterWave';
 
 const yuan = val => `¥ ${numeral(val).format('0,0')}`;
+const cop = val => `$ ${numeral(val).format('0,0')}`;
 
 const Charts = {
   yuan,
+  cop,
   Bar,
   Pie,
   Gauge,
@@ -30,6 +32,7 @@ const Charts = {
 export {
   Charts as default,
   yuan,
+  cop,
   Bar,
   Pie,
   Gauge,
