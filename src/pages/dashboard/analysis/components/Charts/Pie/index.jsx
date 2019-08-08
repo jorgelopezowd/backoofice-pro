@@ -2,7 +2,7 @@ import { Chart, Coord, Geom, Tooltip } from 'bizcharts';
 import React, { Component } from 'react';
 import { DataView } from '@antv/data-set';
 import Debounce from 'lodash.debounce';
-import { Divider } from 'antd';
+import { Divider, Row, Col } from 'antd';
 import ReactFitText from 'react-fittext';
 import classNames from 'classnames';
 import autoHeight from '../autoHeight';
@@ -173,11 +173,7 @@ class Pie extends Component {
       tooltip = false;
 
       formatColor = value => {
-        if (value === '占比') {
-          return color || 'rgba(24, 144, 255, 0.85)';
-        }
-
-        return '#F0F2F5';
+        return color || '#F0F2F5';
       };
 
       data = [
@@ -208,66 +204,69 @@ class Pie extends Component {
       as: 'percent',
     });
     return (
-      <div ref={this.handleRoot} className={pieClassName} style={style}>
-        <ReactFitText maxFontSize={25}>
-          <div className={styles.chart}>
-            <Chart
-              scale={scale}
-              height={height}
-              forceFit={forceFit}
-              data={dv}
-              padding={padding}
-              animate={animate}
-              onGetG2Instance={this.getG2Instance}
-            >
-              {!!tooltip && <Tooltip showTitle={false} />}
-              <Coord type="theta" innerRadius={inner} />
-              <Geom
-                style={{
-                  lineWidth,
-                  stroke: '#fff',
-                }}
-                tooltip={tooltip ? tooltipFormat : undefined}
-                type="intervalStack"
-                position="percent"
-                color={['x', percent || percent === 0 ? formatColor : defaultColors]}
-                selected={selected}
-              />
-            </Chart>
-
-            {(subTitle || total) && (
-              <div className={styles.total}>
-                {subTitle && <h4 className="pie-sub-title">{subTitle}</h4>}
-                {/* eslint-disable-next-line */}
-                {total && (
-                  <div className="pie-stat">{typeof total === 'function' ? total() : total}</div>
-                )}
-              </div>
-            )}
-          </div>
-        </ReactFitText>
-
-        {hasLegend && (
-          <ul className={styles.legend}>
-            {legendData.map((item, i) => (
-              <li key={item.x} onClick={() => this.handleLegendClick(item, i)}>
-                <span
-                  className={styles.dot}
+      <Row ref={this.handleRoot} className={pieClassName} style={style}>
+        <Col xl={12} lg={24} md={24} sm={24} xs={24}>
+          <ReactFitText maxFontSize={25}>
+            <div className={styles.chart}>
+              <Chart
+                scale={scale}
+                height={height}
+                forceFit={forceFit}
+                data={dv}
+                padding={padding}
+                animate={animate}
+                onGetG2Instance={this.getG2Instance}
+              >
+                {!!tooltip && <Tooltip showTitle={false} />}
+                <Coord type="theta" innerRadius={inner} />
+                <Geom
                   style={{
-                    backgroundColor: !item.checked ? '#aaa' : item.color,
+                    lineWidth,
+                    stroke: '#fff',
                   }}
+                  tooltip={tooltip ? tooltipFormat : undefined}
+                  type="intervalStack"
+                  position="percent"
+                  color={['x', percent || percent === 0 ? formatColor : defaultColors]}
+                  selected={selected}
                 />
-                <span className={styles.legendTitle}>{item.x}</span>
-                <Divider type="vertical" />
-                <span className={styles.percent}>
-                  {`${(Number.isNaN(item.percent) ? 0 : item.percent * 100).toFixed(2)}%`}
-                </span>
-                <span className={styles.value}>{valueFormat ? valueFormat(item.y) : item.y}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+              </Chart>
+
+              {(subTitle || total) && (
+                <div className={styles.total}>
+                  {subTitle && <h4 className="pie-sub-title">{subTitle}</h4>}
+                  {/* eslint-disable-next-line */}
+                  {total && (
+                    <div className="pie-stat">{typeof total === 'function' ? total() : total}</div>
+                  )}
+                </div>
+              )}
+            </div>
+          </ReactFitText>
+        </Col>
+        <Col xl={12} lg={24} md={24} sm={24} xs={24}>
+          {hasLegend && (
+            <ul className={styles.legend}>
+              {legendData.map((item, i) => (
+                <li key={item.x} onClick={() => this.handleLegendClick(item, i)}>
+                  <span
+                    className={styles.dot}
+                    style={{
+                      backgroundColor: !item.checked ? '#aaa' : item.color,
+                    }}
+                  />
+                  <span className={styles.legendTitle}>{item.x}</span>
+                  <Divider type="vertical" />
+                  <span className={styles.percent}>
+                    {`${(Number.isNaN(item.percent) ? 0 : item.percent * 100).toFixed(2)}%`}
+                  </span>
+                  <span className={styles.value}>{valueFormat ? valueFormat(item.y) : item.y}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Col>
+      </Row>
     );
   }
 }
