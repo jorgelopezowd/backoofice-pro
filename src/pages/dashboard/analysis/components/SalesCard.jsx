@@ -1,4 +1,4 @@
-import { Card, Col, DatePicker, Row, Tabs } from 'antd';
+import { Card, Col, DatePicker, Row, Tabs, Icon } from 'antd';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import React from 'react';
 import numeral from 'numeral';
@@ -30,6 +30,7 @@ const SalesCard = ({
   handleRangePickerChange,
   loading,
   selectDate,
+  rankingCustomers
 }) => (
   <Card
     loading={loading}
@@ -68,13 +69,6 @@ const SalesCard = ({
                 />
               </a>
             </div>
-            <RangePicker
-              value={rangePickerValue}
-              onChange={handleRangePickerChange}
-              style={{
-                width: 256,
-              }}
-            />
           </div>
         }
         size="large"
@@ -110,16 +104,16 @@ const SalesCard = ({
                   />
                 </h4>
                 <ul className={styles.rankingList}>
-                  {rankingListData.map((item, i) => (
+                  {rankingCustomers.map((item, i) => (
                     <li key={item.title}>
                       <span className={`${styles.rankingItemNumber} ${i < 3 ? styles.active : ''}`}>
                         {i + 1}
                       </span>
                       <span className={styles.rankingItemTitle} title={item.title}>
-                        {item.title}
+                        {item.firstName} {item.lastName} <Icon type="home" /> {item.city}/{item.state}
                       </span>
                       <span className={styles.rankingItemValue}>
-                        {numeral(item.total).format('0,0')}
+                        $ {numeral(item.totalPaid).format('0,0')}
                       </span>
                     </li>
                   ))}

@@ -2,7 +2,7 @@ import { Card, Radio } from 'antd';
 import { FormattedMessage } from 'umi-plugin-react/locale';
 import React from 'react';
 import { Pie } from './Charts';
-import Yuan from '../utils/Yuan';
+import Cop from '../utils/Cop';
 import styles from '../style.less';
 
 const ProportionSales = ({
@@ -11,17 +11,13 @@ const ProportionSales = ({
   loading,
   salesPieData,
   handleChangeSalesType,
+  chartTitle
 }) => (
   <Card
     loading={loading}
     className={styles.salesCard}
     bordered={false}
-    title={
-      <FormattedMessage
-        id="dashboard-analysis.analysis.the-proportion-of-sales"
-        defaultMessage="The Proportion of Sales"
-      />
-    }
+    title={chartTitle}
     style={{
       height: '100%',
     }}
@@ -58,9 +54,9 @@ const ProportionSales = ({
         subTitle={
           <FormattedMessage id="dashboard-analysis.analysis.sales" defaultMessage="Sales" />
         }
-        total={() => <Yuan>{salesPieData.reduce((pre, now) => now.y + pre, 0)}</Yuan>}
+        total={() => <Cop>{salesPieData.reduce((pre, now) => now.y + pre, 0)}</Cop>}
         data={salesPieData}
-        valueFormat={value => <Yuan>{value}</Yuan>}
+        valueFormat={value => <Cop>{value}</Cop>}
         height={248}
         lineWidth={4}
       />

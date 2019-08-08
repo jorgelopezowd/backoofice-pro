@@ -1,6 +1,7 @@
 import { Axis, Chart, Geom, Tooltip } from 'bizcharts';
 import React, { Component } from 'react';
 import Debounce from 'lodash.debounce';
+import numeral from 'numeral';
 import autoHeight from '../autoHeight';
 import styles from '../index.less';
 
@@ -81,7 +82,7 @@ class Bar extends Component {
       'x*y',
       (x, y) => ({
         name: x,
-        value: y,
+        value: numeral(y).format('0,0'),
       }),
     ];
     return (
@@ -115,7 +116,7 @@ class Bar extends Component {
               label={autoHideXLabels ? undefined : {}}
               tickLine={autoHideXLabels ? undefined : {}}
             />
-            <Axis name="y" min={0} />
+            <Axis name="y" min={0} label={{formatter: val => `${numeral(val).format('0,0')}`}} />
             <Tooltip showTitle={false} crosshairs={false} />
             <Geom type="interval" position="x*y" color={color} tooltip={tooltip} />
           </Chart>
