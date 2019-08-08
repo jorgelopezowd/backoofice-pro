@@ -4,7 +4,7 @@ import React from 'react';
 import numeral from 'numeral';
 import { ChartCard, MiniArea, MiniBar, MiniProgress, Field } from './Charts';
 import Trend from './Trend';
-import Yuan from '../utils/Yuan';
+import Cop from '../utils/Cop';
 import styles from '../style.less';
 
 const topColResponsiveProps = {
@@ -18,7 +18,7 @@ const topColResponsiveProps = {
   },
 };
 
-const IntroduceRow = ({ loading, visitData }) => (
+const IntroduceRow = ({ loading, visitData, totalSales, totalRevenue,avgSales, totalOrders }) => (
   <Row gutter={24} type="flex">
     <Col {...topColResponsiveProps}>
       <ChartCard
@@ -42,18 +42,18 @@ const IntroduceRow = ({ loading, visitData }) => (
           </Tooltip>
         }
         loading={loading}
-        total={() => <Yuan>126560</Yuan>}
+        total={() => <Cop>{numeral(totalSales).format('0,0')}</Cop>}
         footer={
           <Field
             label={
               <FormattedMessage
-                id="dashboard-analysis.analysis.day-sales"
-                defaultMessage="Daily Sales"
+                id="dashboard-analysis.analysis.total-orders"
+                defaultMessage="Total orders"
               />
             }
-            value={`￥${numeral(12423).format('0,0')}`}
+            value={`${numeral(totalOrders).format('0,0')} `}
           />
-        }
+        }  
         contentHeight={46}
       >
         <Trend
@@ -63,11 +63,11 @@ const IntroduceRow = ({ loading, visitData }) => (
           }}
         >
           <FormattedMessage id="dashboard-analysis.analysis.week" defaultMessage="Weekly Changes" />
-          <span className={styles.trendText}>12%</span>
+          <span className={styles.trendText}>${numeral(totalRevenue).format('0,0')}</span>
         </Trend>
         <Trend flag="down">
-          <FormattedMessage id="dashboard-analysis.analysis.day" defaultMessage="Daily Changes" />
-          <span className={styles.trendText}>11%</span>
+          <FormattedMessage id="dashboard-analysis.analysis.avg-day-sales" defaultMessage="Daily Changes" />
+          <span className={styles.trendText}>$ {numeral(avgSales).format('0,0')}</span>
         </Trend>
       </ChartCard>
     </Col>
@@ -89,7 +89,7 @@ const IntroduceRow = ({ loading, visitData }) => (
             <Icon type="info-circle-o" />
           </Tooltip>
         }
-        total={numeral(8846).format('0,0')}
+        total={numeral(totalRevenue).format('0,0')}
         footer={
           <Field
             label={
