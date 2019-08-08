@@ -37,11 +37,40 @@ export function getTimeDistance(type) {
     const nextDate = moment(now).add(1, 'months');
     const nextYear = nextDate.year();
     const nextMonth = nextDate.month();
+    console.log('nextdate',moment().endOf('month').format('YYYY-MM-DD hh:mm'),nextDate)
     return [
       moment(`${year}-${fixedZero(month + 1)}-01 00:00:00`),
-      moment(moment(`${nextYear}-${fixedZero(nextMonth + 1)}-01 00:00:00`).valueOf() - 1000),
+      moment(moment(now).format('YYYY-MM-DD hh:mm')),
     ];
   }
 
   return [moment(`${year}-01-01 00:00:00`), moment(`${year}-12-31 23:59:59`)];
 }
+
+var getDates = function (startDate, endDate, groupBy = 'day') {
+
+  if (groupBy === 'day') {
+      var dates = [],
+          currentDate = startDate,
+          addDays = function (days) {
+              var date = new Date(this.valueOf());
+              date.setDate(date.getDate() + days);
+              return date;
+          };
+      while (currentDate <= endDate) {
+          dates.push(currentDate.toISOString().split('T')[0]);
+          currentDate = addDays.call(currentDate, 1);
+      }
+
+  } else {
+      var dateStart = moment(startDate);
+      var dateEnd = moment(endDate);
+      var dates = [];
+
+      while (dateEnd > dateStart || dateStart.format('M') === dateEnd.format('M')) {
+          dates.push(dateStart.format('YYYY-MM'));
+          dateStart.add(1, 'month');
+      }
+  }
+  return dates;
+};
