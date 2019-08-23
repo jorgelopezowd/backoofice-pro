@@ -30,7 +30,7 @@ const SalesCard = ({
   handleRangePickerChange,
   loading,
   selectDate,
-  rankingCustomers
+  rankingCustomers,
 }) => (
   <Card
     loading={loading}
@@ -41,36 +41,36 @@ const SalesCard = ({
   >
     <div className={styles.salesCard}>
       <Tabs
-        tabBarExtraContent={
-          <div className={styles.salesExtraWrap}>
-            <div className={styles.salesExtra}>
-              <a className={isActive('today')} onClick={() => selectDate('today')}>
-                <FormattedMessage
-                  id="dashboard-analysis.analysis.all-day"
-                  defaultMessage="All Day"
-                />
-              </a>
-              <a className={isActive('week')} onClick={() => selectDate('week')}>
-                <FormattedMessage
-                  id="dashboard-analysis.analysis.all-week"
-                  defaultMessage="All Week"
-                />
-              </a>
-              <a className={isActive('month')} onClick={() => selectDate('month')}>
-                <FormattedMessage
-                  id="dashboard-analysis.analysis.all-month"
-                  defaultMessage="All Month"
-                />
-              </a>
-              <a className={isActive('year')} onClick={() => selectDate('year')}>
-                <FormattedMessage
-                  id="dashboard-analysis.analysis.all-year"
-                  defaultMessage="All Year"
-                />
-              </a>
-            </div>
-          </div>
-        }
+        // tabBarExtraContent={
+        //   <div className={styles.salesExtraWrap}>
+        //     <div className={styles.salesExtra}>
+        //       <a className={isActive('today')} onClick={() => selectDate('today')}>
+        //         <FormattedMessage
+        //           id="dashboard-analysis.analysis.all-day"
+        //           defaultMessage="All Day"
+        //         />
+        //       </a>
+        //       <a className={isActive('week')} onClick={() => selectDate('week')}>
+        //         <FormattedMessage
+        //           id="dashboard-analysis.analysis.all-week"
+        //           defaultMessage="All Week"
+        //         />
+        //       </a>
+        //       <a className={isActive('month')} onClick={() => selectDate('month')}>
+        //         <FormattedMessage
+        //           id="dashboard-analysis.analysis.all-month"
+        //           defaultMessage="All Month"
+        //         />
+        //       </a>
+        //       <a className={isActive('year')} onClick={() => selectDate('year')}>
+        //         <FormattedMessage
+        //           id="dashboard-analysis.analysis.all-year"
+        //           defaultMessage="All Year"
+        //         />
+        //       </a>
+        //     </div>
+        //   </div>
+        // }
         size="large"
         tabBarStyle={{
           marginBottom: 24,
@@ -110,7 +110,8 @@ const SalesCard = ({
                         {i + 1}
                       </span>
                       <span className={styles.rankingItemTitle} title={item.title}>
-                        {item.firstName} {item.lastName} <Icon type="home" /> {item.city}/{item.state}
+                        {item.firstName} {item.lastName} <Icon type="home" /> {item.city}/
+                        {item.state}
                       </span>
                       <span className={styles.rankingItemValue}>
                         $ {numeral(item.totalPaid).format('0,0')}
@@ -122,7 +123,7 @@ const SalesCard = ({
             </Col>
           </Row>
         </TabPane>
-        <TabPane
+        {/* <TabPane
           tab={<FormattedMessage id="dashboard-analysis.analysis.visits" defaultMessage="Visits" />}
           key="views"
         >
@@ -165,7 +166,7 @@ const SalesCard = ({
               </div>
             </Col>
           </Row>
-        </TabPane>
+        </TabPane> */}
       </Tabs>
     </div>
   </Card>

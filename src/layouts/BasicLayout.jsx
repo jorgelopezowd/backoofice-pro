@@ -36,6 +36,7 @@ const footerRender = (_, defaultDom) => {
           textAlign: 'center',
         }}
       >
+        TEST
         <a href="https://www.netlify.com" target="_blank" rel="noopener noreferrer">
           <img
             src="https://www.netlify.com/img/global/badges/netlify-color-bg.svg"

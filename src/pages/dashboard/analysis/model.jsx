@@ -11,11 +11,12 @@ const initState = {
   salesTypeDataOnline: [],
   salesTypeDataOffline: [],
   radarData: [],
-  salesByPayment : [],
-  salesByDate : [],
-  salesAddressState : [],
-  salesByCustomers : [],
-  salesResume :{}
+  salesByPayment: [],
+  salesByDate: [],
+  salesAddressState: [],
+  salesByCustomers: [],
+  salesResume: {},
+  facets: {},
 };
 const Model = {
   namespace: 'dashboardAnalysis',
@@ -39,52 +40,55 @@ const Model = {
       });
     },
 
-    *fetchSalesByDate({payload}, { call, put }) {
-   
-      const response = yield call(salesByPayment,{query:payload});
+    *fetchSalesByDate({ payload }, { call, put }) {
+      const response = yield call(salesByPayment, { query: payload });
       yield put({
         type: 'salesByDate',
         payload: response,
       });
     },
-    
-    *fetchSalesByPayment({payload}, { call, put }) {
 
-      const response = yield call(salesByPayment,{query:payload});
-    
+    *fetchSalesByPayment({ payload }, { call, put }) {
+      const response = yield call(salesByPayment, { query: payload });
+
       yield put({
         type: 'byPayment',
         payload: response,
       });
     },
-    
-    *fetchSalesByAddressState({payload}, { call, put }) {
-      
-      const response = yield call(salesByPayment,{query:payload});
-      console.log('response address',response)
+
+    *fetchSalesByAddressState({ payload }, { call, put }) {
+      const response = yield call(salesByPayment, { query: payload });
+      console.log('response address', response);
       yield put({
         type: 'byAddressState',
         payload: response,
       });
     },
 
-    *fetchSalesByCustomers({payload}, { call, put }) {
-      
-      const response = yield call(salesByPayment,{query:payload});
-      
+    *fetchSalesByCustomers({ payload }, { call, put }) {
+      const response = yield call(salesByPayment, { query: payload });
+      console.log('response customer', response);
       yield put({
         type: 'byCustomers',
         payload: response,
       });
     },
 
-    *fetchSalesResume({payload}, { call, put }) {
-      console.log('fetchSalesResume',payload)
-      const response = yield call(salesByPayment,{query:payload});
-      console.log('fetchSalesResume response',response)
-      
+    *fetchSalesResume({ payload }, { call, put }) {
+      const response = yield call(salesByPayment, { query: payload });
+
       yield put({
         type: 'salesResume',
+        payload: response[0],
+      });
+    },
+
+    *fetchFacets({ payload }, { call, put }) {
+      const response = yield call(salesByPayment, { query: payload });
+
+      yield put({
+        type: 'facets',
         payload: response[0],
       });
     },
@@ -108,7 +112,9 @@ const Model = {
     salesResume(state, { payload }) {
       return { ...state, salesResume: payload };
     },
-    
+    facets(state, { payload }) {
+      return { ...state, facets: payload };
+    },
 
     clear() {
       return initState;

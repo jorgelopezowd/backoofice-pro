@@ -1,4 +1,4 @@
-import { Col, Dropdown, Icon, Menu, Row, DatePicker, Card, Button } from 'antd';
+import { Col, Dropdown, Icon, Menu, Row, DatePicker, Card, Button, Select, Divider } from 'antd';
 import React, { Component, Suspense } from 'react';
 import { GridContent } from '@ant-design/pro-layout';
 import moment from 'moment';
@@ -23,157 +23,173 @@ const dateFormatList = ['DD/MM/YYYY', 'DD/MM/YY'];
 
 @connect(({ dashboardAnalysis, loading }) => ({
   dashboardAnalysis,
-  loading: loading.effects['dashboardAnalysis/fetch'],
+  loading: loading.effects['dashboardAnalysis/fetchFacets'],
 }))
 class Analysis extends Component {
   state = {
     salesType: 'all',
     currentTabKey: '',
     rangePickerValue: getTimeDistance('month'),
+    filter: {},
   };
 
   reqRef = 0;
 
   timeoutId = 0;
 
-  componentDidMount(){
-    this.submitCharts()
+  componentDidMount() {
+    this.submitCharts();
   }
 
-  submitCharts = ()=>  {
+  submitCharts = () => {
     const { dispatch } = this.props;
-    const { rangePickerValue } = this.state
+    const { rangePickerValue, filter } = this.state;
     this.reqRef = requestAnimationFrame(() => {
-      const date_start = moment(rangePickerValue[0]).format('YYYY-MM-DD')
-      const date_end = moment(rangePickerValue[1]).format('YYYY-MM-DD')
+      const date_start = moment(rangePickerValue[0]).format('YYYY-MM-DD');
+      const date_end = moment(rangePickerValue[1]).format('YYYY-MM-DD');
       // console.log('date start end',date_start,date_end)
       dispatch({
         type: 'dashboardAnalysis/fetch',
       });
 
-      let $group = { 
+      let $group = {
         _id: null,
-        totalPaid : {$sum : '$total_paid'},
-        totalRevenue : {$sum : '$total_revenue'},
-        avgSales : {$avg : '$total_paid'},
-        totalOrders : {$sum : 1}
-      }
-      
+        totalPaid: { $sum: '$total_paid' },
+        totalRevenue: { $sum: '$total_revenue' },
+        totalProductCost: { $sum: '$total_product_cost' },
+        avgSales: { $avg: '$total_paid' },
+        totalOrders: { $sum: 1 },
+      };
+
       let $match = {
-        validRevenue : true,
+        validRevenue: true,
+        ...filter,
         // payment : 'PSE'
-      }
-      
+      };
+
       dispatch({
         type: 'dashboardAnalysis/fetchSalesResume',
-        payload : {
-          date_add : {
-            min : date_start,
-            max : date_end
+        payload: {
+          date_add: {
+            min: date_start,
+            max: date_end,
           },
           $group,
           $match,
-          $sort : {totalPaid : -1},
-        }
+          $sort: { totalPaid: -1 },
+        },
       });
-      
-      $group = { 
-        _id: '$payment',
-        totalPaid : {$sum : '$total_paid'},
-        totalRevenue : {$sum : '$total_revenue'},
-        avgPaid : {$avg : '$total_paid'},
-        count : {$sum : 1}
-      }
 
+      $group = {
+        _id: '$payment',
+        totalPaid: { $sum: '$total_paid' },
+        totalRevenue: { $sum: '$total_revenue' },
+        avgPaid: { $avg: '$total_paid' },
+        count: { $sum: 1 },
+      };
 
       dispatch({
         type: 'dashboardAnalysis/fetchSalesByPayment',
-        payload : {
-          date_add : {
-            min : date_start,
-            max : date_end
+        payload: {
+          date_add: {
+            min: date_start,
+            max: date_end,
           },
           $group,
           $match,
-          $sort : {totalPaid : -1},
-        }
+          $sort: { totalPaid: -1 },
+        },
       });
 
-      $group = { _id: { $dateToString: { 
-
-        format: "%Y-%m-%d", 
-        date: "$date_add" ,
-        // timezone: "-05:00",
-        // onNull:"unspecified",
-        } 
-      },
-        totalPaid : {$sum : '$total_paid'},
-        avgPaid : {$avg : '$total_paid'},
-        count : {$sum : 1}
-      }
+      $group = {
+        _id: {
+          $dateToString: {
+            format: '%Y-%m-%d',
+            date: '$date_add',
+            // timezone: "-05:00",
+            // onNull:"unspecified",
+          },
+        },
+        totalPaid: { $sum: '$total_paid' },
+        avgPaid: { $avg: '$total_paid' },
+        count: { $sum: 1 },
+      };
 
       dispatch({
         type: 'dashboardAnalysis/fetchSalesByDate',
-        payload : {
+        payload: {
           $group,
-          date_add : {
-            min : date_start,
-            max : date_end  
+          date_add: {
+            min: date_start,
+            max: date_end,
           },
-          $sort : {_id : 1},
-          $match
-
-          
-        }
+          $sort: { _id: 1 },
+          $match,
+        },
       });
-      
-      $group = { 
+
+      $group = {
         _id: '$invoiceAddress.state',
-        totalPaid : {$sum : '$total_paid'},
-        avgPaid : {$avg : '$total_paid'},
-        count : {$sum : 1}
-      }
+        totalPaid: { $sum: '$total_paid' },
+        avgPaid: { $avg: '$total_paid' },
+        count: { $sum: 1 },
+      };
 
       dispatch({
         type: 'dashboardAnalysis/fetchSalesByAddressState',
-        payload : {
+        payload: {
           $group,
-          date_add : {
-            min : date_start,
-            max : date_end
+          date_add: {
+            min: date_start,
+            max: date_end,
           },
           $match,
-          $sort : {totalPaid : -1}
-          
-        }
+          $sort: { totalPaid: -1 },
+        },
       });
 
-      $group = { _id: '$customer.customerId',
-            totalPaid : {$sum : '$total_paid'},
-            avgPaid : {$avg : '$total_paid'},
-            count : {$sum : 1},
-            customer : {"$first": "$customer"},
-            region : {"$first": "$invoiceAddress"},
-        }
+      $group = {
+        _id: '$customer.customerId',
+        totalPaid: { $sum: '$total_paid' },
+        avgPaid: { $avg: '$total_paid' },
+        count: { $sum: 1 },
+        customer: { $first: '$customer' },
+        region: { $first: '$invoiceAddress' },
+      };
 
       dispatch({
         type: 'dashboardAnalysis/fetchSalesByCustomers',
-        payload : {
+        payload: {
           $group,
-          date_add : {
-            min : date_start,
-            max : date_end
+          date_add: {
+            min: date_start,
+            max: date_end,
           },
           $match,
-          $sort : {totalPaid : -1},
-          $limit : 10
-          
-        }
+          $sort: { totalPaid: -1 },
+          $limit: 10,
+        },
       });
 
+      const $facet = {
+        countries: [{ $sortByCount: '$invoiceAddress.country' }],
+        cities: [{ $sortByCount: '$invoiceAddress.city' }],
+        states: [{ $sortByCount: '$invoiceAddress.state' }],
+      };
 
+      dispatch({
+        type: 'dashboardAnalysis/fetchFacets',
+        payload: {
+          date_add: {
+            min: date_start,
+            max: date_end,
+          },
+          $match,
+          $facet,
+        },
+      });
     });
-  }
+  };
 
   componentWillUnmount() {
     const { dispatch } = this.props;
@@ -208,10 +224,12 @@ class Analysis extends Component {
 
   selectDate = type => {
     const { dispatch } = this.props;
-    this.setState({
-      rangePickerValue: getTimeDistance(type),
-    });
-    
+    this.setState(
+      {
+        rangePickerValue: getTimeDistance(type),
+      },
+      this.submitCharts,
+    );
   };
 
   isActive = type => {
@@ -232,25 +250,32 @@ class Analysis extends Component {
     return '';
   };
 
-  handleChangeDateRange = (value, dateString) =>{
+  handleChangeDateRange = (value, dateString) => {};
 
-  }
+  filterBydate = () => {
+    this.submitCharts();
+  };
 
-  filterBydate = () =>{
-    this.submitCharts()
-  }
-
-  disabledDate = (current)=> {
+  disabledDate = current => {
     // Can not select days before today and today
-    return false;
-    // return current && current > moment().endOf('day');
-  }
+    // return false;
+    return current && current > moment().endOf('day');
+  };
 
-  avgSales = (total, date_start, date_end) =>{
-    const days = date_end.diff(date_start, 'days') + 1
-    return total/days
-  }
+  avgSales = (total, date_start, date_end) => {
+    const days = date_end.diff(date_start, 'days') + 1;
+    return total / days;
+  };
 
+  filterByFacet = (value, facet) => {
+    const { filter } = this.state;
+    if (value !== '') {
+      filter[facet] = value;
+    } else {
+      delete filter[facet];
+    }
+    this.setState(state => ({ ...state, filter }), this.submitCharts);
+  };
   render() {
     const { rangePickerValue, salesType, currentTabKey } = this.state;
     const { dashboardAnalysis, loading } = this.props;
@@ -268,7 +293,8 @@ class Analysis extends Component {
       salesByDate,
       salesAddressState,
       salesByCustomers,
-      salesResume
+      salesResume,
+      facets,
     } = dashboardAnalysis;
     let salesPieData;
     // console.log('salesByPayment',salesByDate)
@@ -278,18 +304,28 @@ class Analysis extends Component {
     } else {
       salesPieData = salesType === 'online' ? salesTypeDataOnline : salesTypeDataOffline;
     }
-    salesPieData = salesByPayment.map(item => {return {x:item._id,y:item.totalPaid}})
-    const salesPieAddressState = salesAddressState.map(item => {return {x:item._id,y:item.totalPaid}})
+    salesPieData = salesByPayment.map(item => {
+      return { x: item._id, y: item.totalPaid };
+    });
+    const salesPieAddressState = salesAddressState.map(item => {
+      return { x: item._id, y: item.totalPaid };
+    });
     // const totalSales = salesByPayment.reduce((a,b)=>a + b.totalPaid,0)
     // const totalRevenue = salesByPayment.reduce((a,b)=>a + b.totalRevenue,0)
-    const {totalRevenue, avgSales, totalPaid, totalOrders} = salesResume
-  
-    const salesByDateXY = salesByDate.map(item => {return {x:item._id, y:item.totalPaid}})
-  
-    console.log('ranking customer',salesByCustomers)
-    console.log('resumesales', salesResume)
+    const { totalRevenue, avgSales, totalPaid, totalOrders, totalProductCost } = salesResume;
+
+    const salesByDateXY = salesByDate.map(item => {
+      return { x: item._id, y: item.totalPaid };
+    });
+
+    // console.log('ranking customer',salesByCustomers)
+    // console.log('facets', facets)
     const rankingCustomers = salesByCustomers.map(item => {
-      const {customer : {customerId, firstName, lastName} , region : {city, state, country}, totalPaid} = item
+      const {
+        customer: { customerId, firstName, lastName },
+        region: { city, state, country },
+        totalPaid,
+      } = item;
       return {
         customerId,
         firstName,
@@ -297,10 +333,10 @@ class Analysis extends Component {
         state,
         city,
         country,
-        totalPaid
-      }
-    })
-    
+        totalPaid,
+      };
+    });
+
     const menu = (
       <Menu>
         <Menu.Item>操作一</Menu.Item>
@@ -314,65 +350,120 @@ class Analysis extends Component {
         </Dropdown>
       </span>
     );
-    console.log('rangePickerValue',rangePickerValue)
+    console.log('rangePickerValue', rangePickerValue);
     const activeKey = currentTabKey || (offlineData[0] && offlineData[0].name);
     return (
       <GridContent>
         <React.Fragment>
           <Row>
             <Col>
-            <Card>
-            <div className={styles.salesExtra}>
-              <a className={this.isActive('today')} onClick={() => this.selectDate('today')}>
-                <FormattedMessage
-                  id="dashboard-analysis.analysis.all-day"
-                  defaultMessage="All Day"
-                />
-              </a>
-              <a className={this.isActive('week')} onClick={() => this.selectDate('week')}>
-                <FormattedMessage
-                  id="dashboard-analysis.analysis.all-week"
-                  defaultMessage="All Week"
-                />
-              </a>
-              <a className={this.isActive('month')} onClick={() => this.selectDate('month')}>
-                <FormattedMessage
-                  id="dashboard-analysis.analysis.all-month"
-                  defaultMessage="All Month"
-                />
-              </a>
-              <a className={this.isActive('year')} onClick={() => this.selectDate('year')}>
-                <FormattedMessage
-                  id="dashboard-analysis.analysis.all-year"
-                  defaultMessage="All Year"
-                />
-              </a>
-            </div>
-              
-              <RangePicker
-              onChange={this.handleRangePickerChange}
-                defaultValue={rangePickerValue}
-                format={dateFormat}
-                disabledDate={this.disabledDate}
-                allowClear={false}
-              />
-              <Button type="primary" icon="search"
-                onClick={this.filterBydate}
-              >
-                Filtrar
-              </Button>
+              <Card>
+                <div className={styles.salesExtra}>
+                  <a className={this.isActive('today')} onClick={() => this.selectDate('today')}>
+                    <FormattedMessage
+                      id="dashboard-analysis.analysis.all-day"
+                      defaultMessage="All Day"
+                    />
+                  </a>
+                  <a className={this.isActive('week')} onClick={() => this.selectDate('week')}>
+                    <FormattedMessage
+                      id="dashboard-analysis.analysis.all-week"
+                      defaultMessage="All Week"
+                    />
+                  </a>
+                  <a className={this.isActive('month')} onClick={() => this.selectDate('month')}>
+                    <FormattedMessage
+                      id="dashboard-analysis.analysis.all-month"
+                      defaultMessage="All Month"
+                    />
+                  </a>
+                  <a className={this.isActive('year')} onClick={() => this.selectDate('year')}>
+                    <FormattedMessage
+                      id="dashboard-analysis.analysis.all-year"
+                      defaultMessage="All Year"
+                    />
+                  </a>
+                </div>
 
-            </Card>
+                <RangePicker
+                  onChange={this.handleRangePickerChange}
+                  defaultValue={rangePickerValue}
+                  value={rangePickerValue}
+                  format={dateFormat}
+                  disabledDate={this.disabledDate}
+                  allowClear={false}
+                />
+
+                <Divider type="vertical" />
+                <Select
+                  showSearch
+                  style={{ width: 200 }}
+                  placeholder="País"
+                  optionFilterProp="children"
+                  onChange={value => this.filterByFacet(value, 'invoiceAddress.country')}
+                  allowClear
+                  filterOption={(input, option) =>
+                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  <Option value="">Todos</Option>
+                  {facets.countries
+                    ? facets.countries.map(item => <Option value={item._id}>{item._id}</Option>)
+                    : null}
+                </Select>
+                <Divider type="vertical" />
+                <Select
+                  showSearch
+                  style={{ width: 200 }}
+                  placeholder="Departamento"
+                  optionFilterProp="children"
+                  onChange={value => this.filterByFacet(value, 'invoiceAddress.state')}
+                  allowClear
+                  filterOption={(input, option) =>
+                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  <Option value="">Todos</Option>
+                  {facets.states
+                    ? facets.states.map(item => <Option value={item._id}>{item._id}</Option>)
+                    : null}
+                </Select>
+                <Divider type="vertical" />
+                <Select
+                  showSearch
+                  style={{ width: 200 }}
+                  placeholder="Ciudad"
+                  optionFilterProp="children"
+                  onChange={value => this.filterByFacet(value, 'invoiceAddress.city')}
+                  allowClear
+                  filterOption={(input, option) =>
+                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  <Option value="">Todos</Option>
+                  {facets.cities
+                    ? facets.cities.map(item => <Option value={item._id}>{item._id}</Option>)
+                    : null}
+                </Select>
+                <Divider type="vertical" />
+
+                <Button type="primary" icon="search" onClick={this.filterBydate}>
+                  Filtrar
+                </Button>
+              </Card>
             </Col>
           </Row>
           <Suspense fallback={<PageLoading />}>
-            <IntroduceRow loading={loading} visitData={visitData} totalSales={totalPaid} 
-            totalRevenue={totalRevenue}
-            // avgSales={this.avgSales(totalSales,rangePickerValue[0],rangePickerValue[1])}
-            avgSales={avgSales}
-            totalOrders={totalOrders}
+            <IntroduceRow
+              loading={loading}
+              visitData={visitData}
+              totalSales={totalPaid}
+              totalRevenue={totalRevenue}
+              avgDaily={this.avgSales(totalPaid, rangePickerValue[0], rangePickerValue[1])}
+              avgSales={avgSales}
+              totalOrders={totalOrders}
+              totalProductCost={totalProductCost}
             />
-
           </Suspense>
           <Suspense fallback={null}>
             <SalesCard
@@ -405,10 +496,12 @@ class Analysis extends Component {
             <Col xl={12} lg={24} md={24} sm={24} xs={24}>
               <Suspense fallback={null}>
                 <ProportionSales
-                  chartTitle={<FormattedMessage
-                    id="dashboard-analysis.analysis.sales-by-address-state"
-                    defaultMessage="Sales by state"
-                  />}
+                  chartTitle={
+                    <FormattedMessage
+                      id="dashboard-analysis.analysis.sales-by-address-state"
+                      defaultMessage="Sales by state"
+                    />
+                  }
                   dropdownGroup={dropdownGroup}
                   salesType={salesType}
                   loading={loading}
@@ -420,10 +513,12 @@ class Analysis extends Component {
             <Col xl={12} lg={24} md={24} sm={24} xs={24}>
               <Suspense fallback={null}>
                 <ProportionSales
-                  chartTitle={<FormattedMessage
-                    id="dashboard-analysis.analysis.the-proportion-of-sales"
-                    defaultMessage="Sales by payment"
-                  />}
+                  chartTitle={
+                    <FormattedMessage
+                      id="dashboard-analysis.analysis.the-proportion-of-sales"
+                      defaultMessage="Sales by payment"
+                    />
+                  }
                   dropdownGroup={dropdownGroup}
                   salesType={salesType}
                   loading={loading}
@@ -433,7 +528,7 @@ class Analysis extends Component {
               </Suspense>
             </Col>
           </Row>
-          <Suspense fallback={null}>
+          {/* <Suspense fallback={null}>
             <OfflineData
               activeKey={activeKey}
               loading={loading}
@@ -441,7 +536,7 @@ class Analysis extends Component {
               offlineChartData={offlineChartData}
               handleTabChange={this.handleTabChange}
             />
-          </Suspense>
+          </Suspense> */}
         </React.Fragment>
       </GridContent>
     );

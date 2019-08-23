@@ -18,7 +18,16 @@ const topColResponsiveProps = {
   },
 };
 
-const IntroduceRow = ({ loading, visitData, totalSales, totalRevenue,avgSales, totalOrders }) => (
+const IntroduceRow = ({
+  loading,
+  visitData,
+  totalSales,
+  totalRevenue,
+  avgSales,
+  totalOrders,
+  avgDaily,
+  totalProductCost,
+}) => (
   <Row gutter={24} type="flex">
     <Col {...topColResponsiveProps}>
       <ChartCard
@@ -53,21 +62,95 @@ const IntroduceRow = ({ loading, visitData, totalSales, totalRevenue,avgSales, t
             }
             value={`${numeral(totalOrders).format('0,0')} `}
           />
-        }  
-        contentHeight={46}
+        }
+        contentHeight={70}
+      >
+        <Trend flag="down">
+          <FormattedMessage
+            id="dashboard-analysis.analysis.avg-orders"
+            defaultMessage="Daily Changes"
+          />
+          <span className={styles.trendText}>$ {numeral(avgSales).format('0,0')}</span>
+        </Trend>
+        <Trend flag="down">
+          <FormattedMessage
+            id="dashboard-analysis.analysis.avg-day-sales"
+            defaultMessage="Daily Changes"
+          />
+          <span className={styles.trendText}>$ {numeral(avgDaily).format('0,0')}</span>
+        </Trend>
+      </ChartCard>
+    </Col>
+    <Col {...topColResponsiveProps}>
+      <ChartCard
+        bordered={false}
+        title={
+          <FormattedMessage
+            id="dashboard-analysis.analysis.total-sales"
+            defaultMessage="Total Sales"
+          />
+        }
+        action={
+          <Tooltip
+            title={
+              <FormattedMessage
+                id="dashboard-analysis.analysis.introduce"
+                defaultMessage="Introduce"
+              />
+            }
+          >
+            <Icon type="info-circle-o" />
+          </Tooltip>
+        }
+        loading={loading}
+        total={() => <Cop>{numeral(totalSales).format('0,0')}</Cop>}
+        footer={
+          <Field
+            label={
+              <FormattedMessage
+                id="dashboard-analysis.analysis.total-revenue"
+                defaultMessage="Total orders"
+              />
+            }
+            value={`$ ${numeral(totalRevenue - totalProductCost).format('0,0')}`}
+          />
+        }
+        contentHeight={70}
       >
         <Trend
-          flag="up"
+          flag="left"
+          style={{
+            marginRight: 16,
+          }}
+        >
+          <FormattedMessage
+            id="dashboard-analysis.analysis.total-others"
+            defaultMessage="Weekly Changes"
+          />
+          <span className={styles.trendText}>
+            ${numeral(totalSales - totalRevenue).format('0,0')}
+          </span>
+        </Trend>
+        {/* <Trend
+         
           style={{
             marginRight: 16,
           }}
         >
           <FormattedMessage id="dashboard-analysis.analysis.week" defaultMessage="Weekly Changes" />
           <span className={styles.trendText}>${numeral(totalRevenue).format('0,0')}</span>
-        </Trend>
-        <Trend flag="down">
-          <FormattedMessage id="dashboard-analysis.analysis.avg-day-sales" defaultMessage="Daily Changes" />
-          <span className={styles.trendText}>$ {numeral(avgSales).format('0,0')}</span>
+        </Trend> */}
+        <Trend
+          flag="left"
+          style={{
+            marginRight: 16,
+          }}
+        >
+          <FormattedMessage
+            id="dashboard-analysis.analysis.total-products-sales"
+            defaultMessage="Weekly Changes"
+          />
+          <span className={styles.trendText}>${numeral(totalProductCost).format('0,0')}</span>
         </Trend>
       </ChartCard>
     </Col>
@@ -89,7 +172,7 @@ const IntroduceRow = ({ loading, visitData, totalSales, totalRevenue,avgSales, t
             <Icon type="info-circle-o" />
           </Tooltip>
         }
-        total={numeral(totalRevenue).format('0,0')}
+        total={numeral(0).format('0,0')}
         footer={
           <Field
             label={
@@ -101,7 +184,7 @@ const IntroduceRow = ({ loading, visitData, totalSales, totalRevenue,avgSales, t
             value={numeral(1234).format('0,0')}
           />
         }
-        contentHeight={46}
+        contentHeight={70}
       >
         <MiniArea color="#975FE4" data={visitData} />
       </ChartCard>
@@ -137,7 +220,7 @@ const IntroduceRow = ({ loading, visitData, totalSales, totalRevenue,avgSales, t
             value="60%"
           />
         }
-        contentHeight={46}
+        contentHeight={70}
       >
         <MiniBar data={visitData} />
       </ChartCard>
@@ -193,8 +276,9 @@ const IntroduceRow = ({ loading, visitData, totalSales, totalRevenue,avgSales, t
             </Trend>
           </div>
         }
-        contentHeight={46}
+        contentHeight={70}
       >
+        <MiniProgress percent={78} strokeWidth={8} target={80} color="#13C2C2" />
         <MiniProgress percent={78} strokeWidth={8} target={80} color="#13C2C2" />
       </ChartCard>
     </Col>

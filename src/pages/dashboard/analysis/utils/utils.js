@@ -11,7 +11,14 @@ export function getTimeDistance(type) {
     now.setHours(0);
     now.setMinutes(0);
     now.setSeconds(0);
-    return [moment(now), moment(now.getTime() + (oneDay - 1000))];
+    return [
+      moment(now),
+      moment(
+        moment(now)
+          .endOf('day')
+          .format('YYYY-MM-DD hh:mm'),
+      ),
+    ];
   }
 
   if (type === 'week') {
@@ -27,7 +34,14 @@ export function getTimeDistance(type) {
     }
 
     const beginTime = now.getTime() - day * oneDay;
-    return [moment(beginTime), moment(beginTime + (7 * oneDay - 1000))];
+    return [
+      moment(beginTime),
+      moment(
+        moment(now)
+          .endOf('day')
+          .format('YYYY-MM-DD hh:mm'),
+      ),
+    ];
   }
 
   const year = now.getFullYear();
@@ -37,40 +51,49 @@ export function getTimeDistance(type) {
     const nextDate = moment(now).add(1, 'months');
     const nextYear = nextDate.year();
     const nextMonth = nextDate.month();
-    console.log('nextdate',moment().endOf('month').format('YYYY-MM-DD hh:mm'),nextDate)
+    // console.log('nextdate',moment().endOf('month').format('YYYY-MM-DD hh:mm'),nextDate)
     return [
       moment(`${year}-${fixedZero(month + 1)}-01 00:00:00`),
-      moment(moment(now).format('YYYY-MM-DD hh:mm')),
+      moment(
+        moment(now)
+          .endOf('day')
+          .format('YYYY-MM-DD hh:mm'),
+      ),
     ];
   }
 
-  return [moment(`${year}-01-01 00:00:00`), moment(`${year}-12-31 23:59:59`)];
+  return [
+    moment(`${year}-01-01 00:00:00`),
+    moment(
+      moment(now)
+        .endOf('day')
+        .format('YYYY-MM-DD hh:mm'),
+    ),
+  ];
 }
 
-var getDates = function (startDate, endDate, groupBy = 'day') {
-
+var getDates = function(startDate, endDate, groupBy = 'day') {
   if (groupBy === 'day') {
-      var dates = [],
-          currentDate = startDate,
-          addDays = function (days) {
-              var date = new Date(this.valueOf());
-              date.setDate(date.getDate() + days);
-              return date;
-          };
-      while (currentDate <= endDate) {
-          dates.push(currentDate.toISOString().split('T')[0]);
-          currentDate = addDays.call(currentDate, 1);
-      }
-
+    var dates = [],
+      currentDate = startDate,
+      addDays = function(days) {
+        var date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+      };
+    while (currentDate <= endDate) {
+      dates.push(currentDate.toISOString().split('T')[0]);
+      currentDate = addDays.call(currentDate, 1);
+    }
   } else {
-      var dateStart = moment(startDate);
-      var dateEnd = moment(endDate);
-      var dates = [];
+    var dateStart = moment(startDate);
+    var dateEnd = moment(endDate);
+    var dates = [];
 
-      while (dateEnd > dateStart || dateStart.format('M') === dateEnd.format('M')) {
-          dates.push(dateStart.format('YYYY-MM'));
-          dateStart.add(1, 'month');
-      }
+    while (dateEnd > dateStart || dateStart.format('M') === dateEnd.format('M')) {
+      dates.push(dateStart.format('YYYY-MM'));
+      dateStart.add(1, 'month');
+    }
   }
   return dates;
 };
