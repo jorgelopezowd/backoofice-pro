@@ -1,20 +1,9 @@
 import request from '@/utils/request';
+import app from '@/utils/feathersApp'
 
-const apiUrl =
-  process.env.NODE_ENV === 'development-'
-    ? 'http://localhost:3030'
-    : 'https://api-stats.luckywoman.com.co/';
-
-const io = require('socket.io-client');
-const feathers = require('@feathersjs/feathers');
-const socketio = require('@feathersjs/socketio-client');
-
-const socket = io(apiUrl);
-const app = feathers();
-
-app.configure(socketio(socket));
 
 const orerStatsService = app.service('stats-orders');
+const cartStatsService = app.service('stats-carts');
 // statsService.on('created', message => console.log('Created a message', message));
 // socket.on('order-stats patched',order => {
 //   console.log('order created',order)
@@ -33,5 +22,10 @@ export async function fakeChartData() {
 export async function salesByPayment(params = {}) {
   // console.log('params',params)
   return orerStatsService.find(params);
+  // return request(`${apiUrl}/stats-orders`);
+}
+export async function cartStats(params = {}) {
+  // console.log('params',params)
+  return cartStatsService.find(params);
   // return request(`${apiUrl}/stats-orders`);
 }

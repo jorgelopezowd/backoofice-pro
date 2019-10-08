@@ -1,4 +1,4 @@
-import { fakeChartData, salesByPayment } from './service';
+import { fakeChartData, salesByPayment, cartStats } from './service';
 
 const initState = {
   visitData: [],
@@ -17,6 +17,9 @@ const initState = {
   salesByCustomers: [],
   salesResume: {},
   facets: {},
+  cartData : [],
+  monthStats : {},
+  lastMonthStats : {},
 };
 const Model = {
   namespace: 'dashboardAnalysis',
@@ -92,6 +95,29 @@ const Model = {
         payload: response[0],
       });
     },
+    *fetchCartStats({ payload }, { call, put }) {
+      const response = yield call(cartStats, { query: payload });
+
+      yield put({
+        type: 'cartStats',
+        payload: response,
+      });
+    },
+    *fetchMonthStats({ payload }, { call, put }) {
+      const response = yield call(salesByPayment, { query: payload });
+      yield put({
+        type: 'monthStats',
+        payload: response[0],
+      });
+    },
+    *fetchLastMonthStats({ payload }, { call, put }) {
+      const response = yield call(salesByPayment, { query: payload });
+
+      yield put({
+        type: 'lastMonthStats',
+        payload: response[0],
+      });
+    },
   },
   reducers: {
     save(state, { payload }) {
@@ -114,6 +140,15 @@ const Model = {
     },
     facets(state, { payload }) {
       return { ...state, facets: payload };
+    },
+    cartStats(state, { payload }) {
+      return { ...state, cartData: payload };
+    },
+    monthStats(state, { payload }) {
+      return { ...state, monthStats: payload };
+    },
+    lastMonthStats(state, { payload }) {
+      return { ...state, lastMonthStats: payload };
     },
 
     clear() {
