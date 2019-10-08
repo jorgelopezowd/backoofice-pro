@@ -1,3 +1,8 @@
+const apiUrl =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3030'
+    : 'https://api-stats.luckywoman.com.co/';
+
 export default {
   navTheme: 'dark',
   primaryColor: '#1890FF',
@@ -13,4 +18,5 @@ export default {
   title: 'eCommerce Pro',
   pwa: false,
   iconfontUrl: '',
+  apiUrl,
 };
