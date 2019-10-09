@@ -20,6 +20,7 @@ const topColResponsiveProps = {
 
 const IntroduceRow = ({
   loading,
+  totalVisits,
   visitData,
   totalSales,
   totalRevenue,
@@ -27,6 +28,8 @@ const IntroduceRow = ({
   totalOrders,
   avgDaily,
   totalProductCost,
+  monthStats,
+  lastMonthStats
 }) => (
   <Row gutter={24} type="flex">
     <Col {...topColResponsiveProps}>
@@ -172,7 +175,7 @@ const IntroduceRow = ({
             <Icon type="info-circle-o" />
           </Tooltip>
         }
-        total={numeral(0).format('0,0')}
+        total={numeral(totalVisits).format('0,0')}
         footer={
           <Field
             label={
@@ -181,7 +184,7 @@ const IntroduceRow = ({
                 defaultMessage="Daily Visits"
               />
             }
-            value={numeral(1234).format('0,0')}
+            value={numeral(totalVisits/visitData.length).format('0,0')}
           />
         }
         contentHeight={70}
@@ -189,7 +192,7 @@ const IntroduceRow = ({
         <MiniArea color="#975FE4" data={visitData} />
       </ChartCard>
     </Col>
-    <Col {...topColResponsiveProps}>
+    {/* <Col {...topColResponsiveProps}>
       <ChartCard
         bordered={false}
         loading={loading}
@@ -224,7 +227,7 @@ const IntroduceRow = ({
       >
         <MiniBar data={visitData} />
       </ChartCard>
-    </Col>
+    </Col> */}
     <Col {...topColResponsiveProps}>
       <ChartCard
         loading={loading}
@@ -247,7 +250,7 @@ const IntroduceRow = ({
             <Icon type="info-circle-o" />
           </Tooltip>
         }
-        total="78%"
+        total={`${Math.round((monthStats.totalPaid/lastMonthStats.totalPaid)*100)}%`}
         footer={
           <div
             style={{
@@ -262,23 +265,23 @@ const IntroduceRow = ({
               }}
             >
               <FormattedMessage
-                id="dashboard-analysis.analysis.week"
-                defaultMessage="Weekly Changes"
+                id="dashboard-analysis.analysis.last-month"
+                defaultMessage="Last month"
               />
-              <span className={styles.trendText}>12%</span>
+              <span className={styles.trendText}>{numeral(lastMonthStats.totalPaid).format('0,0')}</span>
             </Trend>
             <Trend flag="down">
               <FormattedMessage
-                id="dashboard-analysis.analysis.day"
-                defaultMessage="Weekly Changes"
+                id="dashboard-analysis.analysis.current-month"
+                defaultMessage="This month"
               />
-              <span className={styles.trendText}>11%</span>
+              <span className={styles.trendText}>{numeral(monthStats.totalPaid).format('0,0')}</span>
             </Trend>
           </div>
         }
         contentHeight={70}
       >
-        <MiniProgress percent={78} strokeWidth={8} target={80} color="#13C2C2" />
+        <MiniProgress percent={100} strokeWidth={8} target={(monthStats.totalPaid/lastMonthStats.totalPaid)*100} color="#13C2C2" />
         <MiniProgress percent={78} strokeWidth={8} target={80} color="#13C2C2" />
       </ChartCard>
     </Col>
