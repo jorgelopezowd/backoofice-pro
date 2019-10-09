@@ -5,6 +5,7 @@
  */
 import ProLayout from '@ant-design/pro-layout';
 import React, { useEffect } from 'react';
+import moment from 'moment'
 import Link from 'umi/link';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
@@ -23,27 +24,20 @@ const menuDataRender = menuList =>
   });
 
 const footerRender = (_, defaultDom) => {
-  if (!isAntDesignPro()) {
-    return defaultDom;
-  }
+  // if (!isAntDesignPro()) {
+  //   return defaultDom;
+  // }
 
   return (
     <>
-      {defaultDom}
+      
       <div
         style={{
           padding: '0px 24px 24px',
           textAlign: 'center',
         }}
       >
-        TEST
-        <a href="https://www.netlify.com" target="_blank" rel="noopener noreferrer">
-          <img
-            src="https://www.netlify.com/img/global/badges/netlify-color-bg.svg"
-            width="82px"
-            alt="netlify logo"
-          />
-        </a>
+        eCommerce Pro - Luckywoman - {moment().format('YYYY-MM-DD')}
       </div>
     </>
   );
