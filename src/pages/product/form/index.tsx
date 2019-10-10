@@ -10,6 +10,7 @@ import {
   Row,
   Select,
   TimePicker,
+  Badge,
   Tabs,
 } from 'antd';
 import React, { Component } from 'react';
@@ -93,6 +94,12 @@ class ProductForm extends Component<FormProps> {
     info: [],
   };
 
+  constructor(props) {
+    super(props);
+    this.shippingForm = React.createRef();
+  }
+
+
   componentDidMount() {
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
@@ -109,13 +116,17 @@ class ProductForm extends Component<FormProps> {
     window.removeEventListener('resize', this.resizeFooterToolbar);
   }
 
-  getErrorInfo = () => {
+  getErrors = (full = true) => {
     const {
       form: { getFieldsError },
     } = this.props;
-    const errors = getFieldsError();
-    const errorCount = Object.keys(errors).filter(key => errors[key]).length;
-    if (!errors || errorCount === 0) {
+    let errors = getFieldsError();
+    if(this.shippingForm.current){
+      errors = {...errors,...this.shippingForm.current.getFieldsError()}
+    }
+    
+    
+    if (!errors) {
       return null;
     }
     const scrollToField = (fieldKey: string) => {
@@ -124,13 +135,32 @@ class ProductForm extends Component<FormProps> {
         labelNode.scrollIntoView(true);
       }
     };
+
+    errors = {
+      ...errors,
+      ...errors.dimensions
+    }
+    if(errors.dimensions){
+      Object.keys(errors.dimensions).forEach(key => {
+        if(errors.dimensions[key]){
+          errors.shipping = true
+        }
+      })
+
+    }
+
+    if(!full){
+      return errors
+    }
+    
+    
     const errorList = Object.keys(errors)
       .map(key => {
         if (!errors[key]) {
           return null;
         }
         const errorMessage = errors[key].title || errors[key][0] || null;
-        // console.log('errorMessage',errorMessage,'errors',errors[key],'key', key)
+        console.log('errors Message',errors[key], key)
         if (!errorMessage) {
           return null;
         }
@@ -143,9 +173,18 @@ class ProductForm extends Component<FormProps> {
         );
       })
       .filter(item => item !== null);
-    console.log('errorList', errorList);
-    if (!errorList.length) {
-      return null;
+    // console.log('errorList', errorList);
+    return errorList
+    // if (!errorList.length) {
+    //   return null;
+    // }
+  }
+
+  getErrorInfo = () => {
+    
+    const errorList = this.getErrors()
+    if(!errorList.length){
+      return null
     }
     return (
       <span className={styles.errorIcon}>
@@ -163,7 +202,7 @@ class ProductForm extends Component<FormProps> {
         >
           <Icon type="exclamation-circle" />
         </Popover>
-        {errorCount}
+        {errorList.length}
       </span>
     );
   };
@@ -181,18 +220,23 @@ class ProductForm extends Component<FormProps> {
     });
   };
 
-  validate = () => {
+  validate = async () => {
     const {
       form: { validateFieldsAndScroll },
       dispatch,
     } = this.props;
+    
+    const shipping = await this.shippingForm.current.validateFields().catch(e=>console.log('error',e))
+    // console.log('shipping',shipping)
     validateFieldsAndScroll((error, values) => {
       console.log('submit values', values, error);
-      if (!error) {
+      if (!error && shipping) {
         // submit the values
         dispatch({
           type: 'formAdvancedForm/submitAdvancedForm',
-          payload: values,
+          payload: {
+            ...values,
+            shipping},
         });
       }
     });
@@ -267,12 +311,13 @@ class ProductForm extends Component<FormProps> {
     } = this.props;
     const { width, info } = this.state;
     const lang = getFieldValue('lang');
-    console.log('lang', lang, info);
+    const errorsList = this.getErrors(false)
+    console.log('errorList', errorsList);
     return (
       <>
         <PageHeaderWrapper content={this.renderTitle()}>
           <StickyContainer>
-            <Tabs defaultActiveKey="info" renderTabBar={renderTabBar}>
+            <Tabs defaultActiveKey="shipping" renderTabBar={renderTabBar}>
               <TabPane
                 tab={
                   <span>
@@ -303,16 +348,18 @@ class ProductForm extends Component<FormProps> {
 
               <TabPane
                 tab={
+                    <Badge dot={errorsList.shipping}>
                   <span>
-                    <Icon type="rocket" />
-                    Transporte
+                      <Icon type="rocket" />
+                    Transporte y envío
                   </span>
+                      </Badge>
                 }
                 key="shipping"
               >
-                {getFieldDecorator('stock', {
+                {getFieldDecorator('shipping', {
                   initialValue: tableData,
-                })(<ProductShipping submitting={submitting} />)}
+                })(<ProductShipping ref={this.shippingForm} submitting={submitting} />)}
               </TabPane>
 
               <TabPane
