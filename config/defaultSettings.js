@@ -19,4 +19,17 @@ export default {
   pwa: false,
   iconfontUrl: '',
   apiUrl,
+  langDefault : 'cb',
+  langs : [
+    {id: 'es', label: 'Español'},
+    {id: 'cb', label: 'Colombia'},
+    {id: 'mx', label: 'México'}
+  ],
+  currencyDefault : 'COP',
+  currencies : [
+    {id : 'COP', symbol : '$', sufix : '', prefix:'$', format : '0,0'},
+    {id : 'MX', symbol : '$', sufix : '', prefix:'$', format : '0,0'},
+    {id : 'USD', symbol : '$', sufix : '', prefix:'USD $', format : '0,0'},
+  ]
+
 };

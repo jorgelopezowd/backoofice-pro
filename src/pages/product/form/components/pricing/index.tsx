@@ -5,7 +5,7 @@ import {
     DatePicker,
     Form,
     Icon,
-    Input,
+    InputNumber,
     Popover,
     Row,
     Select,
@@ -17,27 +17,29 @@ import {
   
   import styles from './../../style.less';
 
+  import defaultSettings from './../../../../../../config/defaultSettings';
+
+  const { currencies, currencyDefault } = defaultSettings;
+
   const { Option } = Select;
 
+  const taxDefault = 'na'
+  const taxes = [
+    {id : 'na', tax : 0, label : 'Sin impuesto'},
+    {id : 'co', tax : 19.0, label : '19% Colombia'},
+  ]
+
   const fieldLabels = {
-    name: 'Nombre',
-    url: '仓库域名',
-    owner: '仓库管理员',
-    approver: '审批人',
-    dateRange: '生效日期',
-    type: '仓库类型',
-    name2: '任务名',
-    url2: '任务描述',
-    owner2: '执行人',
-    approver2: '责任人',
-    dateRange2: '生效日期',
-    type2: '任务类型',
+    price: 'Precio de venta (sin IVA)',
+    wholesale: 'Costo producción',
+    tax : 'Impuesto'
+   
   };
 
   interface FormDateType {
     key: string;
     workId?: string;
-    name?: string;
+    price?: string;
     department?: string;
     isNew?: boolean;
     editable?: boolean;
@@ -70,71 +72,48 @@ class ProductInfo extends PureComponent<FormProps,FormState>{
             form: { getFieldDecorator }
         } = this.props;
 
-        return  <Card title="Información comercial" className={styles.card} bordered={false}>
+        return  <Card title="Precios" className={styles.card} bordered={false}>
         <Form layout="vertical" hideRequiredMark>
-          <Row gutter={16}>
-            <Col lg={6} md={12} sm={24}>
-              <Form.Item label={fieldLabels.name}>
-                {getFieldDecorator('name', {
-                  rules: [{ required: true, message: '请输入仓库名称' }],
-                })(<Input placeholder="请输入仓库名称" />)}
-              </Form.Item>
-            </Col>
-            <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-              <Form.Item label={fieldLabels.url}>
-                {getFieldDecorator('url', {
-                  rules: [{ required: true, message: '请选择' }],
-                })(
-                  <Input
-                    style={{ width: '100%' }}
-                    addonBefore="http://"
-                    addonAfter=".com"
-                    placeholder="请输入"
-                  />,
-                )}
-              </Form.Item>
-            </Col>
-            <Col xl={{ span: 8, offset: 2 }} lg={{ span: 10 }} md={{ span: 24 }} sm={24}>
-              <Form.Item label={fieldLabels.owner}>
-                {getFieldDecorator('owner', {
-                  rules: [{ required: true, message: '请选择管理员' }],
-                })(
-                  <Select placeholder="请选择管理员">
-                    <Option value="xiao">付晓晓</Option>
-                    <Option value="mao">周毛毛</Option>
-                  </Select>,
-                )}
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col lg={6} md={12} sm={24}>
-              <Form.Item label={fieldLabels.approver}>
-                {getFieldDecorator('approver', {
-                  rules: [{ required: true, message: '请选择审批员' }],
-                })(
-                  <Select placeholder="请选择审批员">
-                    <Option value="xiao">付晓晓</Option>
-                    <Option value="mao">周毛毛</Option>
-                  </Select>,
-                )}
-              </Form.Item>
-            </Col>
-            <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+          {currencies.map(currency => 
+            <Row gutter={16}>
+              <Col lg={6} md={12} sm={24}>
+                <Form.Item label={`${fieldLabels.price} ${currency.id}`}>
+                  {getFieldDecorator(`price.${currency.id}`, {
+                    rules: [{ required: true, message: `${fieldLabels.price} ${currency.id} es obligatorio` }],
+                  })(<InputNumber style={{width:'100%'}} min={0} placeholder="0"
+                  formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={value => value.replace(/\$\s?|(,*)/g, '')}  
+                  />)}
+                </Form.Item>
+              </Col>
+              <Col lg={6} md={12} sm={24}>
+                <Form.Item label={fieldLabels.tax}>
+                  {getFieldDecorator(`tax.${currency.id}`, {
+                    rules: [{ required: true, message: `${fieldLabels.tax} ${currency.id} es obligatorio` }],
+                    initialValue : taxDefault
+                  })(<Select>
+                    {taxes.map(item => <Option value={item.id} >{item.label}</Option>)}
+                  </Select>)}
+                </Form.Item>
+              </Col>
               
-            </Col>
-            <Col xl={{ span: 8, offset: 2 }} lg={{ span: 10 }} md={{ span: 24 }} sm={24}>
-              <Form.Item label={fieldLabels.type}>
-                {getFieldDecorator('type', {
-                  rules: [{ required: true, message: '请选择仓库类型' }],
-                })(
-                  <Select placeholder="请选择仓库类型">
-                    <Option value="private">私密</Option>
-                    <Option value="public">公开</Option>
-                  </Select>,
-                )}
-              </Form.Item>
-            </Col>
+              <Col lg={6} md={12} sm={24}>
+                <Form.Item label={fieldLabels.wholesale}>
+                  {getFieldDecorator(`wholesale.${currency.id}`, {
+                    rules: [{ required: true, message: `${fieldLabels.wholesale} ${currency.id} es obligatorio` }],
+                  })(<InputNumber style={{width:'100%'}} min={0} placeholder="0"
+                  formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={value => value.replace(/\$\s?|(,*)/g, '')}  
+                  />)}
+                </Form.Item>
+              </Col>
+            
+            </Row>
+          )}
+
+          <Row gutter={16}>
+            
+           
           </Row>
         </Form>
       </Card>

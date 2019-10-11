@@ -14,7 +14,7 @@ import {
   } from 'antd';
   import React, { PureComponent } from 'react';
   import { FormComponentProps } from 'antd/es/form';
-  
+    
   import styles from './../../style.less';
 
   const { Option } = Select;
@@ -58,9 +58,6 @@ interface FormProps extends FormComponentProps {
 
 class ProductShipping extends PureComponent<FormProps,FormState>{
 
-  submitForm = ()=>{
-    console.log('submit shipping' )
-  }
  
     render(){
 

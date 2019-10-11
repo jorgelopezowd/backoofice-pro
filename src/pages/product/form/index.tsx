@@ -37,17 +37,7 @@ const { TabPane } = Tabs;
 const fieldLabels = {
   name: 'Nombre',
   type: 'Tipo de producto',
-  lang: 'Idioma',
-  url: '仓库域名',
-  owner: '仓库管理员',
-  approver: '审批人',
-  dateRange: '生效日期',
-  name2: '任务名',
-  url2: '任务描述',
-  owner2: '执行人',
-  approver2: '责任人',
-  dateRange2: '生效日期',
-  type2: '任务类型',
+  lang: 'Idioma'
 };
 
 const tableData = [
@@ -97,6 +87,7 @@ class ProductForm extends Component<FormProps> {
   constructor(props) {
     super(props);
     this.shippingForm = React.createRef();
+    this.pricingForm = React.createRef();
   }
 
 
@@ -124,6 +115,19 @@ class ProductForm extends Component<FormProps> {
     if(this.shippingForm.current){
       errors = {...errors,...this.shippingForm.current.getFieldsError()}
     }
+    if(this.pricingForm.current){
+      const pricing = this.pricingForm.current.getFieldsError()
+      Object.keys(pricing).forEach(key => {
+        Object.keys(pricing[key]).forEach(key2 => {
+          if(pricing[key][key2]){
+            errors = {...errors,[`${key}-${key2}`]:pricing[key][key2],pricing:true}
+          }
+
+        })
+
+      })
+      console.log('error pricing',pricing,'error',errors)
+    }
     
     
     if (!errors) {
@@ -148,6 +152,7 @@ class ProductForm extends Component<FormProps> {
       })
 
     }
+    
 
     if(!full){
       return errors
@@ -227,10 +232,11 @@ class ProductForm extends Component<FormProps> {
     } = this.props;
     
     const shipping = await this.shippingForm.current.validateFields().catch(e=>console.log('error',e))
+    const pricing = await this.pricingForm.current.validateFields().catch(e=>console.log('error pricing',e))
     // console.log('shipping',shipping)
     validateFieldsAndScroll((error, values) => {
       console.log('submit values', values, error);
-      if (!error && shipping) {
+      if (!error && shipping && pricing) {
         // submit the values
         dispatch({
           type: 'formAdvancedForm/submitAdvancedForm',
@@ -309,7 +315,7 @@ class ProductForm extends Component<FormProps> {
       form: { getFieldDecorator, getFieldValue },
       submitting,
     } = this.props;
-    const { width, info } = this.state;
+    const { width } = this.state;
     const lang = getFieldValue('lang');
     const errorsList = this.getErrors(false)
     console.log('errorList', errorsList);
@@ -317,8 +323,9 @@ class ProductForm extends Component<FormProps> {
       <>
         <PageHeaderWrapper content={this.renderTitle()}>
           <StickyContainer>
-            <Tabs defaultActiveKey="shipping" renderTabBar={renderTabBar}>
+            <Tabs defaultActiveKey="pricing" renderTabBar={renderTabBar}>
               <TabPane
+                forceRender
                 tab={
                   <span>
                     <Icon type="folder" />
@@ -333,6 +340,7 @@ class ProductForm extends Component<FormProps> {
               </TabPane>
 
               <TabPane
+                forceRender
                 tab={
                   <span>
                     <Icon type="code-sandbox" />
@@ -347,6 +355,7 @@ class ProductForm extends Component<FormProps> {
               </TabPane>
 
               <TabPane
+                forceRender
                 tab={
                     <Badge dot={errorsList.shipping}>
                   <span>
@@ -358,25 +367,29 @@ class ProductForm extends Component<FormProps> {
                 key="shipping"
               >
                 {getFieldDecorator('shipping', {
-                  initialValue: tableData,
+                  initialValue: {},
                 })(<ProductShipping ref={this.shippingForm} submitting={submitting} />)}
               </TabPane>
 
               <TabPane
+                forceRender
                 tab={
-                  <span>
-                    <Icon type="dollar" />
-                    Precio
-                  </span>
+                  <Badge dot={errorsList.pricing}>
+                    <span>
+                      <Icon type="dollar" />
+                      Precios
+                    </span>
+                  </Badge>
                 }
                 key="pricing"
               >
                 {getFieldDecorator('pricing', {
                   initialValue: tableData,
-                })(<ProductPricing submitting={submitting} />)}
+                })(<ProductPricing ref={this.pricingForm} submitting={submitting} />)}
               </TabPane>
 
               <TabPane
+                forceRender
                 tab={
                   <span>
                     <Icon type="search" />
@@ -409,4 +422,4 @@ class ProductForm extends Component<FormProps> {
   }
 }
 
-export default Form.create<FormProps>()(ProductForm);
+export default Form.create<FormProps>({ withRef: true })(ProductForm);

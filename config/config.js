@@ -97,10 +97,24 @@ export default {
           component: './dashboard/analysis',
         },
         {
-          name: 'Productos',
+          name: 'Catalogo',
           icon: 'folder',
-          path: '/list/basic/list',
-          component: './list/basic/list',
+          path: '/catalog',
+          routes : [
+            {
+              name : 'Productos',
+              path : '/catalog/products',
+              component: './product/basic/list',
+            },
+            {
+              path: '/catalog/products/new',
+              component: './product/form',
+            },
+            {
+              path: '/catalog/products/:id',
+              component: './product/form',
+            },
+          ]
         },
         {
           path: '/home',
