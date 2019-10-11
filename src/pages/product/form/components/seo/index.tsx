@@ -65,7 +65,7 @@ class ProductInfo extends PureComponent<FormProps,FormState>{
             langs
         } = this.props;
 
-        return  <Card title="Información comercial" className={styles.card} bordered={false}>
+        return  <Card title="Datos para SEO" className={styles.card} bordered={false}>
         <Form layout="vertical" hideRequiredMark>
           <Row gutter={24}>
             <Col md={12} xs={24}>
@@ -129,7 +129,7 @@ class ProductInfo extends PureComponent<FormProps,FormState>{
               <Row gutter={8} hidden={lang !== itemLang.id}>
                 <Col xs={24}>
                     
-                    <Card title={`Ejemplo de google >> ${itemLang.label}`} >
+                    <Card title={`Ejemplo de google >> ${itemLang.label}`} style={{marginTop:28}} >
                       <span className={styles.googleTitle}>{getFieldValue(`${itemLang.id}.title`) || 'Título en google'}</span>
                       <span className={styles.googleLink}>{getFieldValue(`${itemLang.id}.slug`) || 'http://enlace.com'}</span>
                       <span className={styles.googleDescription}>{getFieldValue(`${itemLang.id}.seoDescription`) || 'Descripción Google'}</span>
