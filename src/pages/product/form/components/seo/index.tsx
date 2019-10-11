@@ -2,21 +2,18 @@ import {
     Button,
     Card,
     Col,
-    DatePicker,
     Form,
     Icon,
     Input,
-    Popover,
     Row,
     Select,
-    TimePicker,
-    Divider,
     Typography
   } from 'antd';
   import React, { PureComponent } from 'react';
   import { FormComponentProps } from 'antd/es/form';
   
   import styles from './../../style.less';
+  import slugFormat from '@/utils/slugFormat'
 
   const { Option } = Select;
   const {TextArea} = Input
@@ -63,7 +60,7 @@ class ProductInfo extends PureComponent<FormProps,FormState>{
     render(){
 
         const {
-            form: { getFieldDecorator, getFieldValue },
+            form: { getFieldDecorator, getFieldValue, setFieldsValue },
             lang, 
             langs
         } = this.props;
@@ -81,7 +78,12 @@ class ProductInfo extends PureComponent<FormProps,FormState>{
                   >
                     {getFieldDecorator(`${itemLang.id}.slug`, {
                       rules: [{ required: true, message: 'Url Amigable' }],
-                    })(<Input placeholder="URL amigable" maxLength={256} />)}
+                    })(<Input 
+                      onBlur={e => setFieldsValue({[`${itemLang.id}.slug`]: slugFormat(e.target.value) })}
+                      placeholder="URL amigable" 
+                      maxLength={256}
+                      prefix={<Icon type='link' />} 
+                    />)}
                   </Form.Item>
                 ))}
                 </Col>

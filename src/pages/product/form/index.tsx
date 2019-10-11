@@ -281,7 +281,7 @@ class ProductForm extends Component<FormProps> {
         <Col xs={24} md={12}>
           {langs.map(itemLang => (
             <Form.Item
-              label={fieldLabels.name}
+              label={`${fieldLabels.name} (${itemLang.label})`}
               style={itemLang.id === lang ? {} : { display: 'none' }}
             >
               {getFieldDecorator(`${itemLang.id}.title`, {
@@ -289,10 +289,10 @@ class ProductForm extends Component<FormProps> {
                 rules: [
                   {
                     required: true,
-                    message: `Nombre es obligatorio ${itemLang.label}`,
+                    message: `Nombre es obligatorio (${itemLang.label})`,
                   },
                 ],
-              })(<Input type={itemLang.id === lang ? 'text' : 'hidden'} />)}
+              })(<Input type={itemLang.id === lang ? 'text' : 'hidden'} size='large' />)}
             </Form.Item>
           ))}
         </Col>
@@ -301,7 +301,7 @@ class ProductForm extends Component<FormProps> {
             {getFieldDecorator('lang', {
               initialValue: langDefault,
             })(
-              <Select>
+              <Select size='large'>
                 {langs.map((lang: any) => (
                   <Option value={lang.id}>{lang.label}</Option>
                 ))}
@@ -315,7 +315,7 @@ class ProductForm extends Component<FormProps> {
             {getFieldDecorator('type', {
               initialValue: 'single',
             })(
-              <Select>
+              <Select size='large'>
                 {productTypes.map((pType: any) => (
                   <Option value={pType.id}>{pType.label}</Option>
                 ))}
