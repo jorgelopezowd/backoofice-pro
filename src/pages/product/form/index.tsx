@@ -84,10 +84,15 @@ class ProductForm extends Component<FormProps> {
     info: [],
   };
 
-  constructor(props) {
+  seoForm : any
+  pricingForm : any 
+  shippingForm : any
+
+  constructor(props : any) {
     super(props);
     this.shippingForm = React.createRef();
     this.pricingForm = React.createRef();
+    this.seoForm = React.createRef();
   }
 
 
@@ -122,11 +127,21 @@ class ProductForm extends Component<FormProps> {
           if(pricing[key][key2]){
             errors = {...errors,[`${key}-${key2}`]:pricing[key][key2],pricing:true}
           }
-
         })
-
       })
-      console.log('error pricing',pricing,'error',errors)
+    }
+
+    if(this.seoForm.current){
+      const seoErrors = this.seoForm.current.getFieldsError()
+      console.log('errors >> seo',seoErrors)
+      Object.keys(seoErrors).forEach(key => {
+        Object.keys(seoErrors[key]).forEach(key2 => {
+          if(seoErrors[key][key2]){
+            errors = {...errors,[`${key}-${key2}`]:seoErrors[key][key2],seo:true}
+          }
+        })
+      })
+      // errors = {...errors,...this.seoForm.current.getFieldsError()}
     }
     
     
@@ -144,6 +159,7 @@ class ProductForm extends Component<FormProps> {
       ...errors,
       ...errors.dimensions
     }
+    console.log('errors >> ',errors)
     if(errors.dimensions){
       Object.keys(errors.dimensions).forEach(key => {
         if(errors.dimensions[key]){
@@ -233,6 +249,7 @@ class ProductForm extends Component<FormProps> {
     
     const shipping = await this.shippingForm.current.validateFields().catch(e=>console.log('error',e))
     const pricing = await this.pricingForm.current.validateFields().catch(e=>console.log('error pricing',e))
+    const seo = await this.seoForm.current.validateFields().catch(e=>console.log('error pricing',e))
     // console.log('shipping',shipping)
     validateFieldsAndScroll((error, values) => {
       console.log('submit values', values, error);
@@ -323,7 +340,7 @@ class ProductForm extends Component<FormProps> {
       <>
         <PageHeaderWrapper content={this.renderTitle()}>
           <StickyContainer>
-            <Tabs defaultActiveKey="pricing" renderTabBar={renderTabBar}>
+            <Tabs defaultActiveKey="seo" renderTabBar={renderTabBar}>
               <TabPane
                 forceRender
                 tab={
@@ -391,16 +408,22 @@ class ProductForm extends Component<FormProps> {
               <TabPane
                 forceRender
                 tab={
-                  <span>
-                    <Icon type="search" />
-                    SEO
-                  </span>
+                  <Badge dot={errorsList.seo}>
+                    <span>
+                      <Icon type="search" />
+                      SEO
+                    </span>
+                  </Badge>
                 }
                 key="seo"
               >
                 {getFieldDecorator('seo', {
-                  initialValue: tableData,
-                })(<ProductSeo />)}
+                  initialValue: {},
+                })(<ProductSeo 
+                    ref={this.seoForm} 
+                    submitting={submitting}  
+                    langs={langs}
+                    lang={lang}/>)}
               </TabPane>
             </Tabs>
           </StickyContainer>

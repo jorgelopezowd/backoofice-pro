@@ -10,7 +10,8 @@ import {
     Row,
     Select,
     TimePicker,
-    Tabs,
+    Divider,
+    Typography
   } from 'antd';
   import React, { PureComponent } from 'react';
   import { FormComponentProps } from 'antd/es/form';
@@ -18,20 +19,13 @@ import {
   import styles from './../../style.less';
 
   const { Option } = Select;
+  const {TextArea} = Input
+  const {Title, Paragraph, Text} = Typography
 
   const fieldLabels = {
-    name: 'Nombre',
-    url: '仓库域名',
-    owner: '仓库管理员',
-    approver: '审批人',
-    dateRange: '生效日期',
-    type: '仓库类型',
-    name2: '任务名',
-    url2: '任务描述',
-    owner2: '执行人',
-    approver2: '责任人',
-    dateRange2: '生效日期',
-    type2: '任务类型',
+    slug: 'Url Amigable',
+    seoTitle : 'Título',
+    seoDescription : 'Descripción'
   };
 
   interface FormDateType {
@@ -47,6 +41,8 @@ import {
   interface FormProps {
     loading?: boolean;
     value?: FormDateType[];
+    langs : [];
+    lang : string;
     onChange?: (value: FormDateType[]) => void;
   }
   
@@ -67,73 +63,79 @@ class ProductInfo extends PureComponent<FormProps,FormState>{
     render(){
 
         const {
-            form: { getFieldDecorator }
+            form: { getFieldDecorator, getFieldValue },
+            lang, 
+            langs
         } = this.props;
 
         return  <Card title="Información comercial" className={styles.card} bordered={false}>
         <Form layout="vertical" hideRequiredMark>
-          <Row gutter={16}>
-            <Col lg={6} md={12} sm={24}>
-              <Form.Item label={fieldLabels.name}>
-                {getFieldDecorator('name', {
-                  rules: [{ required: true, message: '请输入仓库名称' }],
-                })(<Input placeholder="请输入仓库名称" />)}
-              </Form.Item>
-            </Col>
-            <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-              <Form.Item label={fieldLabels.url}>
-                {getFieldDecorator('url', {
-                  rules: [{ required: true, message: '请选择' }],
-                })(
-                  <Input
-                    style={{ width: '100%' }}
-                    addonBefore="http://"
-                    addonAfter=".com"
-                    placeholder="请输入"
-                  />,
-                )}
-              </Form.Item>
-            </Col>
-            <Col xl={{ span: 8, offset: 2 }} lg={{ span: 10 }} md={{ span: 24 }} sm={24}>
-              <Form.Item label={fieldLabels.owner}>
-                {getFieldDecorator('owner', {
-                  rules: [{ required: true, message: '请选择管理员' }],
-                })(
-                  <Select placeholder="请选择管理员">
-                    <Option value="xiao">付晓晓</Option>
-                    <Option value="mao">周毛毛</Option>
-                  </Select>,
-                )}
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col lg={6} md={12} sm={24}>
-              <Form.Item label={fieldLabels.approver}>
-                {getFieldDecorator('approver', {
-                  rules: [{ required: true, message: '请选择审批员' }],
-                })(
-                  <Select placeholder="请选择审批员">
-                    <Option value="xiao">付晓晓</Option>
-                    <Option value="mao">周毛毛</Option>
-                  </Select>,
-                )}
-              </Form.Item>
-            </Col>
-            <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+          <Row gutter={24}>
+            <Col md={12} xs={24}>
               
+              <Row gutter={16}>
+                <Col sm={24}>
+                {langs.map((itemLang : any) => (
+                  <Form.Item label={`${fieldLabels.slug} (${itemLang.label})`}
+                  style={itemLang.id === lang ? {} : { display: 'none' }}
+                  >
+                    {getFieldDecorator(`${itemLang.id}.slug`, {
+                      rules: [{ required: true, message: 'Url Amigable' }],
+                    })(<Input placeholder="URL amigable" maxLength={256} />)}
+                  </Form.Item>
+                ))}
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col sm={24}>
+                  {langs.map((itemLang : any) => (
+                  <Form.Item label={`${fieldLabels.seoTitle} (${itemLang.label})`}
+                    style={itemLang.id === lang ? {} : { display: 'none' }}
+                  >
+                    {getFieldDecorator(`${itemLang.id}.seoTitle`, {
+                      rules: [{ required: true, message: 'Titulo' }],
+                    })(
+                      <Input placeholder="Titulo SEO" maxLength={60} />
+                    )}
+                  </Form.Item>
+                  ))}
+                </Col>
+              
+              
+              </Row>
+
+              <Row gutter={16}>
+                <Col sm={24}>
+                  {langs.map((itemLang : any) => (
+                  <Form.Item label={`${fieldLabels.seoDescription} (${itemLang.label})`}
+                    style={itemLang.id === lang ? {} : { display: 'none' }}
+                  >
+                    {getFieldDecorator(`${itemLang.id}.seoDescription`, {
+                      rules: [{ required: true, message: 'Descripción' }],
+                    })(
+                      <TextArea placeholder="Descripción SEO" maxLength={160} rows={5} />
+                    )}
+                  </Form.Item>
+                  ))}
+                </Col>
+              
+              
+              </Row>
             </Col>
-            <Col xl={{ span: 8, offset: 2 }} lg={{ span: 10 }} md={{ span: 24 }} sm={24}>
-              <Form.Item label={fieldLabels.type}>
-                {getFieldDecorator('type', {
-                  rules: [{ required: true, message: '请选择仓库类型' }],
-                })(
-                  <Select placeholder="请选择仓库类型">
-                    <Option value="private">私密</Option>
-                    <Option value="public">公开</Option>
-                  </Select>,
-                )}
-              </Form.Item>
+            <Col md={12} xs={24}>
+              {langs.map((itemLang : any) => (
+              <Row gutter={8} hidden={lang !== itemLang.id}>
+                <Col xs={24}>
+                    
+                    <Card title={`Ejemplo de google >> ${itemLang.label}`} >
+                      <span className={styles.googleTitle}>{getFieldValue(`${itemLang.id}.title`) || 'Título en google'}</span>
+                      <span className={styles.googleLink}>{getFieldValue(`${itemLang.id}.slug`) || 'http://enlace.com'}</span>
+                      <span className={styles.googleDescription}>{getFieldValue(`${itemLang.id}.seoDescription`) || 'Descripción Google'}</span>
+
+                    </Card>
+                </Col>
+              </Row>
+              ))}
             </Col>
           </Row>
         </Form>
