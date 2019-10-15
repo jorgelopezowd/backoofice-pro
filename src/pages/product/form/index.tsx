@@ -19,6 +19,7 @@ import { Dispatch } from 'redux';
 import { FormComponentProps } from 'antd/es/form';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
+import QueueAnim from 'rc-queue-anim';
 // import TableForm from './components/TableForm';
 import FooterToolbar from './components/FooterToolbar';
 import ProductInfo from './components/info';
@@ -337,10 +338,12 @@ class ProductForm extends Component<FormProps> {
     const errorsList = this.getErrors(false)
     console.log('errorList', errorsList);
     return (
-      <>
-        <PageHeaderWrapper content={this.renderTitle()}>
+      <QueueAnim
+        ease={['easeOutQuart', 'easeInOutQuart']}
+      >
+        <PageHeaderWrapper key="1" content={this.renderTitle()}>
           <StickyContainer>
-            <Tabs defaultActiveKey="seo" renderTabBar={renderTabBar}>
+            <Tabs defaultActiveKey="info" renderTabBar={renderTabBar}>
               <TabPane
                 forceRender
                 tab={
@@ -353,7 +356,7 @@ class ProductForm extends Component<FormProps> {
               >
                 {getFieldDecorator(`${lang}.info`, {
                   initialValue: tableData,
-                })(<ProductInfo submitting={submitting} />)}
+                })(<ProductInfo lang={lang} langs={langs} submitting={submitting} />)}
               </TabPane>
 
               <TabPane
@@ -440,7 +443,7 @@ class ProductForm extends Component<FormProps> {
             Guardar
           </Button>
         </FooterToolbar>
-      </>
+      </QueueAnim>
     );
   }
 }

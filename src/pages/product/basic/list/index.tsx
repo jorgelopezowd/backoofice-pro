@@ -24,6 +24,7 @@ import { FormComponentProps } from 'antd/es/form';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
 import { findDOMNode } from 'react-dom';
+import QueueAnim from 'rc-queue-anim';
 import moment from 'moment';
 import { StateType } from './model';
 import { BasicListItemDataType } from './data.d';
@@ -294,7 +295,8 @@ class BasicList extends Component<
       <>
         <PageHeaderWrapper>
           <div className={styles.standardList}>
-            <Card bordered={false}>
+          <QueueAnim>
+            <Card key="1" bordered={false}>
               <Row>
                 <Col sm={8} xs={24}>
                   <Info title="Productos sin Stock" value="8" bordered />
@@ -312,6 +314,7 @@ class BasicList extends Component<
             </Card>
 
             <Card
+            key="2"
               className={styles.listCard}
               bordered={false}
               title="Productos"
@@ -320,7 +323,11 @@ class BasicList extends Component<
               extra={extraContent}
             >
              
-              <List
+            <QueueAnim
+             delay={500}
+             type={['top','bottom']}
+             ease={['easeOutQuart', 'easeInOutQuart']}
+             component={List}
                 size="large"
                 rowKey="id"
                 loading={loading}
@@ -328,6 +335,7 @@ class BasicList extends Component<
                 dataSource={list}
                 renderItem={item => (
                   <List.Item
+                    key={item.id}
                     actions={[
                       <Link
                         key="edit"
@@ -347,7 +355,9 @@ class BasicList extends Component<
                   </List.Item>
                 )}
               />
+              
             </Card>
+            </QueueAnim>
           </div>
         </PageHeaderWrapper>
 

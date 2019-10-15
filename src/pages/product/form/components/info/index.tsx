@@ -1,144 +1,220 @@
 import {
-    Button,
-    Card,
-    Col,
-    DatePicker,
-    Form,
-    Icon,
-    Input,
-    Popover,
-    Row,
-    Select,
-    TimePicker,
-    Tabs,
-  } from 'antd';
-  import React, { PureComponent } from 'react';
-  import { FormComponentProps } from 'antd/es/form';
-  
-  import styles from './../../style.less';
+  Button,
+  Card,
+  Col,
+  Form,
+  Icon,
+  Input,
+  Row,
+  Select,
+  Tree,
+  Tabs
+} from 'antd';
+import React, { PureComponent } from 'react';
+import { FormComponentProps } from 'antd/es/form';
 
-  const { Option } = Select;
+import styles from './../../style.less';
+import UploadImages from './UploadImages'
+import slugFormat from '@/utils/slugFormat'
 
-  const fieldLabels = {
-    name: 'Nombre',
-    url: '仓库域名',
-    owner: '仓库管理员',
-    approver: '审批人',
-    dateRange: '生效日期',
-    type: '仓库类型',
-    name2: '任务名',
-    url2: '任务描述',
-    owner2: '执行人',
-    approver2: '责任人',
-    dateRange2: '生效日期',
-    type2: '任务类型',
-  };
+const { Option } = Select;
+const {TextArea} = Input
+const { TabPane } = Tabs
+const { TreeNode } = Tree
 
-  interface FormDateType {
-    key: string;
-    workId?: string;
-    name?: string;
-    department?: string;
-    isNew?: boolean;
-    editable?: boolean;
-  }
+const fieldLabels = {
+  description : 'Descripción',
+  shortDescription : 'Resumen',
+  ean13 : 'EAN13',
+  barcode : 'Código de barra',
+  reference : 'Referencia',
+  sku : 'SKU',
+};
+
+interface FormDateType {
+  key: string;
+  workId?: string;
+  name?: string;
+  department?: string;
+  isNew?: boolean;
+  editable?: boolean;
+}
 
 
-  interface FormProps {
-    loading?: boolean;
-    value?: FormDateType[];
-    onChange?: (value: FormDateType[]) => void;
-  }
-  
-  interface FormState {
-    loading?: boolean;
-    value?: FormDateType[];
-    data?: FormDateType[];
-  }
+interface FormProps {
+  loading?: boolean;
+  value?: FormDateType[];
+  langs : [];
+  lang : string;
+  onChange?: (value: FormDateType[]) => void;
+}
+
+interface FormState {
+  loading?: boolean;
+  value?: FormDateType[];
+  data?: FormDateType[];
+}
 
 
 interface FormProps extends FormComponentProps {
-    submitting: boolean;
+  submitting: boolean;
 }
 
 
 class ProductInfo extends PureComponent<FormProps,FormState>{
 
-    render(){
+  render(){
 
-        const {
-            form: { getFieldDecorator }
-        } = this.props;
+      const {
+          form: { getFieldDecorator, getFieldValue, setFieldsValue },
+          lang, 
+          langs
+      } = this.props;
 
-        return  <Card title="Información comercial" className={styles.card} bordered={false}>
-        <Form layout="vertical" hideRequiredMark>
-          <Row gutter={16}>
-            <Col lg={6} md={12} sm={24}>
-              <Form.Item label={fieldLabels.name}>
-                {getFieldDecorator('name', {
-                  rules: [{ required: true, message: '请输入仓库名称' }],
-                })(<Input placeholder="请输入仓库名称" />)}
-              </Form.Item>
-            </Col>
-            <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-              <Form.Item label={fieldLabels.url}>
-                {getFieldDecorator('url', {
-                  rules: [{ required: true, message: '请选择' }],
-                })(
-                  <Input
-                    style={{ width: '100%' }}
-                    addonBefore="http://"
-                    addonAfter=".com"
-                    placeholder="请输入"
-                  />,
-                )}
-              </Form.Item>
-            </Col>
-            <Col xl={{ span: 8, offset: 2 }} lg={{ span: 10 }} md={{ span: 24 }} sm={24}>
-              <Form.Item label={fieldLabels.owner}>
-                {getFieldDecorator('owner', {
-                  rules: [{ required: true, message: '请选择管理员' }],
-                })(
-                  <Select placeholder="请选择管理员">
-                    <Option value="xiao">付晓晓</Option>
-                    <Option value="mao">周毛毛</Option>
-                  </Select>,
-                )}
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col lg={6} md={12} sm={24}>
-              <Form.Item label={fieldLabels.approver}>
-                {getFieldDecorator('approver', {
-                  rules: [{ required: true, message: '请选择审批员' }],
-                })(
-                  <Select placeholder="请选择审批员">
-                    <Option value="xiao">付晓晓</Option>
-                    <Option value="mao">周毛毛</Option>
-                  </Select>,
-                )}
-              </Form.Item>
-            </Col>
-            <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-              
-            </Col>
-            <Col xl={{ span: 8, offset: 2 }} lg={{ span: 10 }} md={{ span: 24 }} sm={24}>
-              <Form.Item label={fieldLabels.type}>
-                {getFieldDecorator('type', {
-                  rules: [{ required: true, message: '请选择仓库类型' }],
-                })(
-                  <Select placeholder="请选择仓库类型">
-                    <Option value="private">私密</Option>
-                    <Option value="public">公开</Option>
-                  </Select>,
-                )}
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-      </Card>
-    }
+      return  <>
+            <Row gutter={16}>
+              <Col sm={24} md={24} lg={12}>
+                <Card title="Información comercial" className={styles.card} bordered={false}>
+                  <UploadImages />
+                  <Tabs defaultActiveKey='1' tabPosition='top'>
+                    <TabPane key='1' tab={fieldLabels.description}>
+                      {langs.map((itemLang : any) => (
+                      <Form.Item label={`${fieldLabels.description} (${itemLang.label})`}
+                        style={itemLang.id === lang ? {} : { display: 'none' }}
+                      >
+                        {getFieldDecorator(`${itemLang.id}.description`, {
+                          rules: [{ required: true, message: 'Descripción' }],
+                        })(
+                          <TextArea placeholder="Descripción" maxLength={160} rows={5} />
+                        )}
+                      </Form.Item>
+                      ))}
+
+                    </TabPane>
+                    <TabPane key='2' tab={fieldLabels.shortDescription}>
+                      {langs.map((itemLang : any) => (
+                      <Form.Item label={`${fieldLabels.shortDescription} (${itemLang.label})`}
+                        style={itemLang.id === lang ? {} : { display: 'none' }}
+                      >
+                        {getFieldDecorator(`${itemLang.id}.shortDescription`, {
+                          rules: [{ required: true, message: 'Descripción' }],
+                        })(
+                          <TextArea placeholder="Resumen" maxLength={160} rows={5} />
+                        )}
+                      </Form.Item>
+                      ))}
+
+                    </TabPane>
+                  </Tabs>
+                  </Card>
+              </Col>
+              <Col sm={24} md={24} lg={12}>
+                 <Card title="Datos de inventario" className={styles.card} bordered={false}>
+                   <Row gutter={12}>
+                     <Col xs={12}>
+                      <Form.Item label={`${fieldLabels.reference}`}
+                          
+                        >
+                          {getFieldDecorator(`reference`, {
+                            rules: [{ required: true, message: `${fieldLabels.reference} es obligatorio` }],
+                          })(
+                            <Input placeholder="Referencia" maxLength={160} />
+                          )}
+                      </Form.Item>
+                       
+                     </Col>
+                     <Col xs={12}>
+                      <Form.Item label={`${fieldLabels.ean13}`}
+                          
+                        >
+                          {getFieldDecorator(`ean13`, {
+                          })(
+                            <Input placeholder="Referencia" maxLength={13} />
+                          )}
+                      </Form.Item>
+
+                     </Col>
+                     <Col xs={12}>
+                      <Form.Item label={`${fieldLabels.barcode}`}
+                          
+                        >
+                          {getFieldDecorator(`barcode`, {
+                            rules: [{ required: true, message: `${fieldLabels.barcode} es obligatorio` }],
+                          })(
+                            <Input placeholder="Código de barras" maxLength={160} />
+                          )}
+                      </Form.Item>
+
+                     </Col>
+                     <Col xs={12}>
+                      <Form.Item label={`${fieldLabels.sku}`}
+                          
+                        >
+                          {getFieldDecorator(`sku`, {
+                          })(
+                            <Input placeholder="SKU" maxLength={160} />
+                          )}
+                      </Form.Item>
+
+                     </Col>
+                   </Row>
+
+                   
+                </Card>
+              </Col>
+
+              <Col sm={24} md={24} lg={12}>
+                <Card title="Categorías" className={styles.card} bordered={false}>
+                <Tree
+                    checkable
+                    defaultExpandedKeys={['0-0-0', '0-0-1']}
+                    defaultSelectedKeys={['0-0-0', '0-0-1']}
+                    defaultCheckedKeys={['0-0-0', '0-0-1']}
+                  >
+                    <TreeNode title="parent 1" key="0-0">
+                      <TreeNode title="parent 1-0" key="0-0-0" disabled>
+                        <TreeNode title="leaf" key="0-0-0-0" disableCheckbox />
+                        <TreeNode title="leaf" key="0-0-0-1" />
+                      </TreeNode>
+                      <TreeNode title="parent 1-1" key="0-0-1">
+                        <TreeNode title={<span style={{ color: '#1890ff' }}>sss</span>} key="0-0-1-0" />
+                      </TreeNode>
+                    </TreeNode>
+                  </Tree>
+                </Card>
+              </Col>
+              </Row>
+            <Row>
+              <Col sm={24} md={24} lg={12}>
+                <Card title="Caraterísticas" className={styles.card} bordered={false}>
+                          <Row>
+                            <Col xs={8}>
+                              <Select defaultValue='1'>
+                                {['caracteristica 1', '2','3'].map(item => 
+                                (<Option value={item}>{item}</Option>)
+                                  )}
+                              </Select>
+                            </Col>
+                            <Col xs={8}>
+                              <Select defaultValue='1'>
+                                {['caracteristica 1', '2','3'].map(item => 
+                                (<Option value={item}>{item}</Option>)
+                                  )}
+                              </Select>
+                            </Col>
+                          </Row>
+                </Card>
+              </Col>
+            </Row>
+            
+           
+
+            
+         
+      
+   
+    </>
   }
+}
 
-  export default Form.create<FormProps>()(ProductInfo)
+export default Form.create<FormProps>()(ProductInfo)
